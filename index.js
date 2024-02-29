@@ -29,7 +29,7 @@ async function repeat() {
       timestamp = new Date();
     }
     
-  } catch(err){console.log(err)}
+  } catch(err){console.log('repeat error'+err)}
 }
 
 async function timedBonus(token) {
@@ -69,6 +69,11 @@ async function auth() {
 app.get("/", (req, res) => {
   res.send("Bot status: Acitve<br>Last request: " + timestamp);
 });
+
+app.get('/end', (req, res)=>{
+  repeat()
+  res.send('SENT')
+})
 
 let timestamp = "None";
 setInterval(repeat, 1801000);
