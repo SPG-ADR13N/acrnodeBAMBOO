@@ -1,5 +1,6 @@
 let express = require("express");
 let axios = require("axios");
+let cron = require('node-cron');
 axios.interceptors.response.use(
   response => response,
   error => {
@@ -76,6 +77,8 @@ app.get('/end', (req, res)=>{
 })
 
 let timestamp = "None";
-setInterval(repeat, 1801000);
+cron.schedule('*/31 * * * * *', () => {
+  repeat()
+}); 
 app.listen(3000)
 repeat()
