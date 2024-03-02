@@ -70,11 +70,19 @@ async function auth() {
 app.get("/", (req, res) => {
   res.send("Bot status: Acitve<br>Last request: " + timestamp);
 });
+app.head("/", (req, res) => {
+  res.send("Bot status: Acitve<br>Last request: " + timestamp);
+});
 
 app.get('/end', (req, res)=>{
   repeat()
   res.send('SENT')
 })
+app.head('/end', (req, res)=>{
+  repeat()
+  res.send('SENT')
+})
+
 
 let timestamp = "None";
 cron.schedule('*/31 * * * * *', () => {
