@@ -5,6 +5,10 @@ Set env variables username and password to your email and password for rocketbot
 Set up a uptimerobot http head pinger every 5 or 10 or 15 min for both endpoints / and /end
 This might work without uptimerobot, but the cron jobs tend to fail.
 
+Example that is currently pinging my own account:
+https://acrnode.vercel.app/
+
+
 Code tested, compiled, and written by thehermit (currently impersonating [RSJ] shimobri)
 */
 
