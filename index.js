@@ -1,7 +1,6 @@
 let express = require("express");
 let axios = require("axios");
 let cron = require('node-cron');
-
 axios.interceptors.response.use(
   response => response,
   error => {
@@ -30,12 +29,13 @@ async function repeat() {
       console.log(response.data);
       timestamp = new Date();
     }
-    
-  } catch(err){console.log('repeat error'+err)}
+
+  } catch(err){console.log('repeat error'+err); return err}
+  return ;
 }
 
 async function timedBonus(token) {
-  
+
   let headers = {
     authorization: "Bearer " + token,
   };
@@ -69,19 +69,40 @@ async function auth() {
   return res;
 }
 app.get("/", (req, res) => {
-  res.send("Bot status: Acitve<br>Last request: " + timestamp);
+  let time = timestamp.toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles"
+    })
+  
+  res.send("Bot status: Acitve<br>Last request: " + time);
 });
 app.head("/", (req, res) => {
-  res.send("Bot status: Acitve<br>Last request: " + timestamp);
-});
+  let time = timestamp.toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles"
+    })
 
-app.get('/end', (req, res)=>{
-  repeat()
-  res.send('SENT')
+  res.send("Bot status: Acitve<br>Last request: " + time);
+});
+app.get('/end', async (req, res)=>{
+  let a = false
+  let b=false
+  try {
+    b = await repeat()
+  } catch(e) {
+    a=e
+  }
+  res.send(a?a:'Completed'+'<br>'+b?b:'No errors')
+
 })
-app.head('/end', (req, res)=>{
-  repeat()
-  res.send('SENT')
+app.head('/end', async (req, res)=>{
+  let a = false
+  let b=false
+  try {
+    b = await repeat()
+  } catch(e) {
+    a=e
+  }
+  res.send(a?a:'Completed'+'<br>'+b?b:'No errors')
+  
 })
 
 
