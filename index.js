@@ -1,16 +1,11 @@
 /*
-This is an ACR program written in Node.js, mostly based off Tank8's python ACR.
-This program is deployable in vercel. Fork this respitory and deploy it yourself. 
-Set env variables username and password to your email and password for rocketbot.
+This is an auto-joiner program written in Node.js, mostly based off the ACR program.
+This program is deployable in vercel. Fork this repository and deploy it yourself. 
+Set env variables username and password to your email and password for RocketBot.
 Set up a uptimerobot http head pinger every 5 or 10 or 15 min for both endpoints / and /end
-This might work without uptimerobot, but the cron jobs tend to fail.
-
-Example that is currently pinging my own account:
-https://acrnode.vercel.app/
-
-
 
 Code tested, compiled, and written by thehermit (currently impersonating [RSJ] shimobri)
+Remixed for auto-joining Squad Death Match by SPG_ADR13N
 */
 
 let express = require("express");
@@ -20,7 +15,6 @@ let resclock=[]
 axios.interceptors.response.use(
   response => response,
   error => {
-    // Handle error globally
     if (error.response) {
       console.log("Axios error:", error.response.data);
     } else {
@@ -40,7 +34,7 @@ async function repeat(n) {
 
     let token = response.data.token;
     console.log(response.data)
-    response = await timedBonus(token);
+    response = await autoJoin(token);   // <--- changed from timedBonus to autoJoin
     if(response){
       console.log(response.data);
       timestamp = new Date();
@@ -51,15 +45,20 @@ async function repeat(n) {
   return ;
 }
 
-async function timedBonus(token) {
-
+// === CHANGED FUNCTION ===
+async function autoJoin(token) {
   let headers = {
     authorization: "Bearer " + token,
   };
-  let ops = '\x22\x7B\x7D\x22';
+
+  let payload = {
+    game_mode: "deathmatch",   // change this to "sdm" once you confirm the exact gamemode string
+    party_size: 1
+  };
+
   let res = await axios.post(
-    "https://dev-nakama.winterpixel.io/v2/rpc/collect_timed_bonus",
-    ops,
+    "https://dev-nakama.winterpixel.io/v2/matchmaker/add",
+    payload,
     { headers: headers },
   );
   return res;
@@ -90,14 +89,14 @@ app.get("/", (req, res) => {
       timeZone: "America/Los_Angeles"
     })
   
-  res.send("Bot status: Acitve<br>Last request: " + time+ '<br>'+`[${resclock.join(', ')}]`);
+  res.send("Bot status: Active<br>Last request: " + time+ '<br>'+`[${resclock.join(', ')}]`);
 });
 app.head("/", (req, res) => {
   let time = timestamp.toLocaleString("en-US", {
       timeZone: "America/Los_Angeles"
     })
 
-  res.send("Bot status: Acitve<br>Last request: " + time+ '<br>'+`[${resclock.join(', ')}]`);
+  res.send("Bot status: Active<br>Last request: " + time+ '<br>'+`[${resclock.join(', ')}]`);
 });
 app.get('/end', async (req, res)=>{
   let a = false
@@ -124,7 +123,7 @@ app.head('/end', async (req, res)=>{
 
 
 let timestamp = "None";
-cron.schedule('*/31 * * * * *', () => {
+cron.schedule('*/61 * * * * *', () => {
   repeat(1)
 }); 
 app.listen(3000)
